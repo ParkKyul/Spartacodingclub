@@ -65,6 +65,21 @@
     </style>
 
     <script>
+    $(document).ready(function () {
+     get_rate();
+ });
+
+ function get_rate(){
+     $.ajax({
+         type: "GET",
+         url: "http://spartacodingclub.shop/sparta_api/rate",
+         data: {},
+         success: function (response) {
+             let now_rate = response['rate'];
+             $('#now-rate').text(now_rate);
+         }
+     })
+ }
         function order() {
             alert('애옹');
         }
@@ -77,6 +92,7 @@
     <div class="item-desc">
         <h1>애옹이 팝니다 <span class="price">가격: 30원</span></h1>
         <p>이 애옹이는 애옹이입니다.</p>
+         <p class="rate">달러-원 환율: <span id="now-rate">1219.15</span></p>
     </div>
     <div class="item-order">
         <div class="input-group mb-3">
