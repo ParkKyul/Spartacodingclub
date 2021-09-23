@@ -1,124 +1,148 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <head>
+        <!-- Webpage Title -->
+        <title>모두의 책리뷰 | 스파르타코딩클럽</title>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
 
-    <!-- 구글폰트 -->
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700&display=swap" rel="stylesheet">
+        <!-- JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
 
-    <title>스파르타코딩클럽 | 부트스트랩 연습하기</title>
+        <!-- 구글폰트 -->
+        <link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
 
-    <!-- style -->
-    <style type="text/css">
-        * {
-            font-family: 'Nanum Gothic', sans-serif;
-        }
+        <script type="text/javascript">
 
-        .wrap {
-            width: 900px;
-            margin: auto;
-        }
+            $(document).ready(function () {
+                showReview();
+            });
 
-        .comment {
-            color: gray;
-            font-weight: bold;
-        }
-    </style>
+            function makeReview() {
+                let title = $('#title').val();
+                let author = $('#author').val();
+                let review = $('#bookReview ').val();
 
-</head>
+                $.ajax({
+                    type: "POST",
+                    url: "/review",
+                    data: {title_give: title, author_give: author, review_give: review},
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            alert(response["msg"]);
+                            window.location.reload();
+                        }
 
-<body>
-    <div class="wrap">
-        <div class="jumbotron">
-            <h1 class="display-4">나홀로 야옹 메모장</h1>
-            <p class="lead">중요한 링크를 저장해두고, 나중에 볼 수 있는 공간입니다</p>
-            <hr class="my-4">
-            <p class="lead">
-                <a class="btn btn-primary btn-lg" href="#" role="button">포스팅박스 열기</a>
-            </p>
+                    }
+                })
+            }
+
+            function showReview() {
+                $.ajax({
+                    type: "GET",
+                    url: "/review",
+                    data: {},
+                    success: function (response) {
+                        let reviews = response['all_reviews']
+                        for (let i = 0; i < reviews.length; i++) {
+                            let title = reviews[i]['title']
+                            let author = reviews[i]['author']
+                            let review = reviews[i]['review']
+
+                            let temp_html = `<tr>
+                                                <td>${title}</td>
+                                                <td>${author}</td>
+                                                <td>${review}</td>
+                                            </tr>`
+                            $('#reviews-box').append(temp_html)
+                        }
+                    }
+                })
+            }
+        </script>
+
+        <style type="text/css">
+            * {
+                font-family: "Do Hyeon", sans-serif;
+            }
+
+            h1,
+            h5 {
+                display: inline;
+            }
+
+            .info {
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+
+            .review {
+                text-align: center;
+            }
+
+            .reviews {
+                margin-top: 100px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <img src="https://previews.123rf.com/images/maxxyustas/maxxyustas1511/maxxyustas151100002/47858355-education-concept-books-and-textbooks-on-the-bookshelf-3d.jpg"
+                 class="img-fluid" alt="Responsive image">
+            <div class="info">
+                <h1>읽은 책에 대해 말씀해주세요.</h1>
+                <p>다른 사람을 위해 리뷰를 남겨주세요! 다 같이 좋은 책을 읽는다면 다 함께 행복해질 수 있지 않을까요?</p>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">제목</span>
+                    </div>
+                    <input type="text" class="form-control" id="title">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">저자</span>
+                    </div>
+                    <input type="text" class="form-control" id="author">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">리뷰</span>
+                    </div>
+                    <textarea class="form-control" id="bookReview"
+                              cols="30"
+                              rows="5" placeholder="140자까지 입력할 수 있습니다."></textarea>
+                </div>
+                <div class="review">
+                    <button onclick="makeReview()" type="button" class="btn btn-primary">리뷰 작성하기</button>
+                </div>
+            </div>
+            <div class="reviews">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">제목</th>
+                        <th scope="col">저자</th>
+                        <th scope="col">리뷰</th>
+                    </tr>
+                    </thead>
+                    <tbody id="reviews-box">
+
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="card-columns">
-            <div class="card">
-                <img class="card-img-top"
-                    src="KakaoTalk_20210906_202534651.jpg"
-                    alt="Card image cap">
-                <div class="card-body">
-                    <a href="http://naver.com/" class="card-title">여기 기사 제목이 들어가죠</a>
-                    <p class="card-text">기사의 요약 내용이 들어갑니다. 제리는 기지개를 켭니다.</p>
-                    <p class="card-text comment">여기에 꼬리가 들어갑니다.</p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top"
-                     src="KakaoTalk_20210906_202534651.jpg"
-                     alt="Card image cap">
-                <div class="card-body">
-                    <a href="http://naver.com/" class="card-title">여기 기사 제목이 들어가죠</a>
-                    <p class="card-text">기사의 요약 내용이 들어갑니다. 제리는 삼색이입니다.</p>
-                    <p class="card-text comment">여기에 뒷발이 들어갑니다.</p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top"
-                     src="KakaoTalk_20210906_202534651.jpg"
-                     alt="Card image cap">
-                <div class="card-body">
-                    <a href="http://naver.com/" class="card-title">여기 기사 제목이 들어가죠</a>
-                    <p class="card-text">기사의 요약 내용이 들어갑니다. 제리 발가락은 하찮습니다.</p>
-                    <p class="card-text comment">여기에 앞발이 들어갑니다.</p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top"
-                    src="KakaoTalk_20210906_202534651.jpg"
-                    alt="Card image cap">
-                <div class="card-body">
-                    <a href="http://naver.com/" class="card-title">여기 기사 제목이 들어가죠</a>
-                    <p class="card-text">기사의 요약 내용이 들어갑니다. 제리는 변기에 응아를 쌉니다.</p>
-                    <p class="card-text comment">여기에 야옹이 들어갑니다.</p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top"
-                    src="KakaoTalk_20210906_202534651.jpg"
-                    alt="Card image cap">
-                <div class="card-body">
-                    <a href="http://naver.com/" class="card-title">여기 기사 제목이 들어가죠</a>
-                    <p class="card-text">기사의 요약 내용이 들어갑니다. 비닐 그만 씹어먹어.</p>
-                    <p class="card-text comment">여기에 야옹이 들어갑니다.</p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top"
-                    src="KakaoTalk_20210906_202534651.jpg"
-                    alt="Card image cap">
-                <div class="card-body">
-                    <a href="http://naver.com/" class="card-title">여기 기사 제목이 들어가죠</a>
-                    <p class="card-text">기사의 요약 내용이 들어갑니다. 냥냥냥냥.</p>
-                    <p class="card-text comment">여기에 야용이 들어갑니다.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
+    </body>
 
 </html>
