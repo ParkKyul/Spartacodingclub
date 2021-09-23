@@ -1,148 +1,131 @@
 <!DOCTYPE html>
 <html lang="ko">
-
     <head>
-        <!-- Webpage Title -->
-        <title>모두의 책리뷰 | 스파르타코딩클럽</title>
-
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-              crossorigin="anonymous">
-
-        <!-- JS -->
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>마이 페이보릿 무비스타 | 프론트-백엔드 연결 마지막 예제!</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-                crossorigin="anonymous"></script>
-
-        <!-- 구글폰트 -->
-        <link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
-
-        <script type="text/javascript">
-
-            $(document).ready(function () {
-                showReview();
-            });
-
-            function makeReview() {
-                let title = $('#title').val();
-                let author = $('#author').val();
-                let review = $('#bookReview ').val();
-
-                $.ajax({
-                    type: "POST",
-                    url: "/review",
-                    data: {title_give: title, author_give: author, review_give: review},
-                    success: function (response) {
-                        if (response["result"] == "success") {
-                            alert(response["msg"]);
-                            window.location.reload();
-                        }
-
-                    }
-                })
-            }
-
-            function showReview() {
-                $.ajax({
-                    type: "GET",
-                    url: "/review",
-                    data: {},
-                    success: function (response) {
-                        let reviews = response['all_reviews']
-                        for (let i = 0; i < reviews.length; i++) {
-                            let title = reviews[i]['title']
-                            let author = reviews[i]['author']
-                            let review = reviews[i]['review']
-
-                            let temp_html = `<tr>
-                                                <td>${title}</td>
-                                                <td>${author}</td>
-                                                <td>${review}</td>
-                                            </tr>`
-                            $('#reviews-box').append(temp_html)
-                        }
-                    }
-                })
-            }
-        </script>
-
-        <style type="text/css">
-            * {
-                font-family: "Do Hyeon", sans-serif;
-            }
-
-            h1,
-            h5 {
-                display: inline;
-            }
-
-            .info {
-                margin-top: 20px;
-                margin-bottom: 20px;
-            }
-
-            .review {
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
+        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+        <style>
+            .center {
                 text-align: center;
             }
 
-            .reviews {
-                margin-top: 100px;
+            .star-list {
+                width: 500px;
+                margin: 20px auto 0 auto;
+            }
+
+            .star-name {
+                display: inline-block;
+            }
+
+            .star-name:hover {
+                text-decoration: underline;
+            }
+
+            .card {
+                margin-bottom: 15px;
             }
         </style>
+        <script>
+            $(document).ready(function () {
+                showStar();
+            });
+
+            function showStar() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/list?sample_give=샘플데이터',
+                    data: {},
+                    success: function (response) {
+                        let mystars = response['movie_stars']
+                        for (let i = 0; i < mystars.length; i++) {
+                            let name = mystars[i]['name']
+                            let img_url = mystars[i]['img_url']
+                            let recent = mystars[i]['recent']
+                            let url = mystars[i]['url']
+                            let like = mystars[i]['like']
+
+                            let temp_html = `<div class="card">
+                                                <div class="card-content">
+                                                    <div class="media">
+                                                        <div class="media-left">
+                                                            <figure class="image is-48x48">
+                                                                <img
+                                                                        src="${img_url}"
+                                                                        alt="Placeholder image"
+                                                                />
+                                                            </figure>
+                                                        </div>
+                                                        <div class="media-content">
+                                                            <a href="${url}" target="_blank" class="star-name title is-4">${name} (좋아요: ${like})</a>
+                                                            <p class="subtitle is-6">${recent}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <footer class="card-footer">
+                                                    <a href="#" onclick="likeStar('${name}')" class="card-footer-item has-text-info">
+                                                        위로!
+                                                        <span class="icon">
+                                              <i class="fas fa-thumbs-up"></i>
+                                            </span>
+                                                    </a>
+                                                    <a href="#" onclick="deleteStar('${name}')" class="card-footer-item has-text-danger">
+                                                        삭제
+                                                        <span class="icon">
+                                              <i class="fas fa-ban"></i>
+                                            </span>
+                                                    </a>
+                                                </footer>
+                                            </div>`
+                            $('#star-box').append(temp_html)
+                        }
+                    }
+                });
+            }
+
+            function likeStar(name) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/like',
+                    data: {name_give:name},
+                    success: function (response) {
+                        alert(response['msg']);
+                        window.location.reload()
+                    }
+                });
+            }
+
+            function deleteStar(name) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/delete',
+                    data: {name_give:name},
+                    success: function (response) {
+                        alert(response['msg']);
+                        window.location.reload()
+                    }
+                });
+            }
+
+        </script>
     </head>
-
     <body>
-        <div class="container">
-            <img src="https://previews.123rf.com/images/maxxyustas/maxxyustas1511/maxxyustas151100002/47858355-education-concept-books-and-textbooks-on-the-bookshelf-3d.jpg"
-                 class="img-fluid" alt="Responsive image">
-            <div class="info">
-                <h1>읽은 책에 대해 말씀해주세요.</h1>
-                <p>다른 사람을 위해 리뷰를 남겨주세요! 다 같이 좋은 책을 읽는다면 다 함께 행복해질 수 있지 않을까요?</p>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">제목</span>
-                    </div>
-                    <input type="text" class="form-control" id="title">
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">저자</span>
-                    </div>
-                    <input type="text" class="form-control" id="author">
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">리뷰</span>
-                    </div>
-                    <textarea class="form-control" id="bookReview"
-                              cols="30"
-                              rows="5" placeholder="140자까지 입력할 수 있습니다."></textarea>
-                </div>
-                <div class="review">
-                    <button onclick="makeReview()" type="button" class="btn btn-primary">리뷰 작성하기</button>
+        <section class="hero is-warning">
+            <div class="hero-body">
+                <div class="container center">
+                    <h1 class="title">
+                        마이 페이보릿 무비스타😆
+                    </h1>
+                    <h2 class="subtitle">
+                        순위를 매겨봅시다
+                    </h2>
                 </div>
             </div>
-            <div class="reviews">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">제목</th>
-                        <th scope="col">저자</th>
-                        <th scope="col">리뷰</th>
-                    </tr>
-                    </thead>
-                    <tbody id="reviews-box">
-
-                    </tbody>
-                </table>
-            </div>
+        </section>
+        <div class="star-list" id="star-box">
         </div>
     </body>
-
 </html>
